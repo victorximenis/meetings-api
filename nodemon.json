@@ -4,6 +4,8 @@
         "MYSQL_PASSWORD": "root",
         "MYSQL_DATABASE": "meetings_api",
         "MYSQL_HOST": "localhost",
-        "MYSQL_PORT": 3306
+        "MYSQL_PORT": 3306,
+        "PASSWORD_ENCRYPT_SALT": "$2b$10$Vf1.KwiMppLMYMBcFMfABu",
+        "API_PORT": 3000
     }
 }
