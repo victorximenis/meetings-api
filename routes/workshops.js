@@ -21,7 +21,7 @@ router.get('/', (req, res, next) => {
                             request: {
                                 type: 'GET',
                                 description: 'Retorna os detalhes de um workshop',
-                                url: ((process.env.API_HOST) || 'http://localhost:3000/') + 'workshops/' + w.id
+                                url: ((process.env.API_HOST) || 'http://localhost:' + (process.env.API_PORT || '80') + '/') + 'workshops/' + w.id
                             }
                         }
                     })
@@ -57,7 +57,7 @@ router.get('/:id', (req, res, next) => {
                         request: {
                             type: 'GET',
                             description: 'Retorna todos os workshops',
-                            url: ((process.env.API_HOST) || 'http://localhost:3000/') + 'workshops'
+                            url: ((process.env.API_HOST) || 'http://localhost:' + (process.env.API_PORT || '80') + '/') + 'workshops'
                         }
                     }
                 };
@@ -86,7 +86,7 @@ router.post('/', (req, res, next) => {
                         request: {
                             type: 'GET',
                             description: 'Retorna todos os workshops',
-                            url: ((process.env.API_HOST) || 'http://localhost:3000/') + 'workshops'
+                            url: ((process.env.API_HOST) || 'http://localhost:' + (process.env.API_PORT || '80') + '/') + 'workshops'
                         }
                     }
                 };
@@ -122,7 +122,7 @@ router.put('/:id', (req, res, next) => {
                         request: {
                             type: 'GET',
                             description: 'Retorna os detalhes de um workshop',
-                            url: ((process.env.API_HOST) || 'http://localhost:3000/') + 'workshops/' + req.params.id
+                            url: ((process.env.API_HOST) || 'http://localhost:' + (process.env.API_PORT || '80') + '/') + 'workshops/' + req.params.id
                         }
                     }
                 };
@@ -161,7 +161,7 @@ router.delete('/:id', (req, res, next) => {
                                 request: {
                                     type: 'GET',
                                     description: 'Retorna todos os workshops',
-                                    url: ((process.env.API_HOST) || 'http://localhost:3000/') + 'workshops'
+                                    url: ((process.env.API_HOST) || 'http://localhost:' + (process.env.API_PORT || '80') + '/') + 'workshops'
                                 }
                             }
                         };
