@@ -48,7 +48,7 @@ router.get('/:id', (req, res, next) => {
                 }
 
                 const response = {
-                    message: 'Workshop deletado com sucesso',
+                    message: 'Workshop localizado com sucesso',
                     data: {
                         id: result[0].id,
                         title: result[0].title,
