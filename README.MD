@@ -1,4 +1,5 @@
 # Meetings API
+![Node.js CI](https://github.com/victorximenis/meetings-api/workflows/Node.js%20CI/badge.svg)
 
 API desenvolvida para eventos beneficentes e encontros religiosos
 
