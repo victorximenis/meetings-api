@@ -5,6 +5,7 @@ var logger = require('morgan');
 
 var usersRouter = require('./routes/users');
 var workshopsRouter = require('./routes/workshops');
+var authenticationRouter = require('./routes/authentication');
 
 var app = express();
 
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
 
 app.use('/users', usersRouter);
 app.use('/workshops', workshopsRouter);
+app.use('/authentication', authenticationRouter);
 
 // Tratamento de erro quando não encontrar rota
 app.use((req, res, next) => {

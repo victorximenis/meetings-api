@@ -6,6 +6,8 @@
         "MYSQL_HOST": "localhost",
         "MYSQL_PORT": 3306,
         "PASSWORD_ENCRYPT_SALT": "$2b$10$Vf1.KwiMppLMYMBcFMfABu",
-        "API_PORT": 3000
+        "API_PORT": 3000,
+
+        "JWT_KEY": "54F2778E75B9F3A2178718BE33146"
     }
 }

@@ -2,10 +2,11 @@ var express = require('express');
 var router = express.Router();
 const mysql = require('../mysql').pool;
 const bcrypt = require('bcrypt');
+const auth = require('../middleware/auth');
 
 
 /* GET users listing. */
-router.get('/', (req, res, next) => {
+router.get('/', auth, (req, res, next) => {
   mysql.getConnection((error, conn) => {
       if (error) { return res.status(500).send({ error: error }) }
       conn.query(
@@ -22,7 +23,7 @@ router.get('/', (req, res, next) => {
                           request: {
                               type: 'GET',
                               description: 'Retorna os detalhes de um usuario',
-                              url: ((process.env.API_HOST) || 'http://localhost:' + (process.env.API_PORT || '80') + '/') + 'users/' + w.id
+                              url: ((process.env.API_HOST) || 'http://localhost:' + (process.env.API_PORT || '80') + '/') + 'users/' + u.id
                           }
                       }
                   })
@@ -33,7 +34,7 @@ router.get('/', (req, res, next) => {
   });
 });
 
-router.get('/:id', (req, res, next) => {
+router.get('/:id', auth, (req, res, next) => {
   mysql.getConnection((error, conn) => {
       if (error) { return res.status(500).send({ error: error }) }
       conn.query(
@@ -66,7 +67,7 @@ router.get('/:id', (req, res, next) => {
   });
 });
 
-router.post('/', (req, res, next) => {
+router.post('/', auth, (req, res, next) => {
   mysql.getConnection((error, conn) => {
       if (error) { return res.status(500).send({ error: error }) }
       bcrypt.hash(req.body.password, process.env.PASSWORD_ENCRYPT_SALT, (errBcrypt, hash) => {
