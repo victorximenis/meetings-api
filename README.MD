@@ -2,12 +2,20 @@
 
 API desenvolvida para eventos beneficentes e encontros religiosos
 
-## Installation
+## Instalação
 
 Use o package manager [npm](https://www.npmjs.com/) para instalar.
 
 ```bash
 npm install
+```
+
+## Desenvolvendo
+
+Use o package manager [npm](https://www.npmjs.com/) para executar a API.
+
+```bash
+npm start
 ```
 
 ## Contribua
