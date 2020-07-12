@@ -136,26 +136,38 @@ router.delete('/:id', (req, res, next) => {
     mysql.getConnection((error, conn) => {
         if (error) { return res.status(500).send({ error: error }) }
         conn.query(
-            'DELETE FROM workshops WHERE id = ?;',
+            'SELECT * FROM workshops WHERE id = ?;',
             [req.params.id],
             (error, result, fields) => {
-                if (error) { return res.status(500).send({ error: error }) }
-                conn.release();
-                const response = {
-                    message: 'Workshop deletado com sucesso',
-                    data: {
-                        id: req.params.id,
-                        title: req.body.title,
-                        places: req.body.places,
-                        date: req.body.places,
-                        request: {
-                            type: 'GET',
-                            description: 'Retorna todos os workshops',
-                            url: ((process.env.API_HOST) || 'http://localhost:3000/') + 'workshops'
-                        }
+                if (result.length == 0) {
+                    return res.status(404).send({
+                        mensagem: 'Não foi encontrado nenhum Workshop para o ID informado'
+                    });
+                }
+
+                conn.query(
+                    'DELETE FROM workshops WHERE id = ?;',
+                    [req.params.id],
+                    (error, result, fields) => {
+                        if (error) { return res.status(500).send({ error: error }) }
+                        conn.release();
+                        const response = {
+                            message: 'Workshop deletado com sucesso',
+                            data: {
+                                id: req.params.id,
+                                title: req.body.title,
+                                places: req.body.places,
+                                date: req.body.places,
+                                request: {
+                                    type: 'GET',
+                                    description: 'Retorna todos os workshops',
+                                    url: ((process.env.API_HOST) || 'http://localhost:3000/') + 'workshops'
+                                }
+                            }
+                        };
+                        return res.status(202).send(response);
                     }
-                };
-                return res.status(202).send(response);
+                );
             }
         );
     });
