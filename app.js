@@ -4,6 +4,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var usersRouter = require('./routes/users');
+var workshopsRouter = require('./routes/workshops');
 
 var app = express();
 
@@ -27,6 +28,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/users', usersRouter);
+app.use('/workshops', workshopsRouter);
 
 // Tratamento de erro quando não encontrar rota
 app.use((req, res, next) => {
