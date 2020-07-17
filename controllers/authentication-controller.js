@@ -1,25 +1,24 @@
-const mysql = require('../mysql').pool;
+const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 exports.postAuthentication = (req, res, next) => {
-    mysql.getConnection((error, conn) => {
-        if (error) { return res.status(500).send({ error: error }) }
-        const query = `SELECT * FROM users WHERE username = ?;`;
-        conn.query(query, [req.body.username], (error, result, fields) => {
-            conn.release();
-            if (error) { return res.status(500).send({ error: error }) }
-            if (result.length < 1) {
-                return res.status(401).send({ message: 'Unauthorized' });
-            }
-            bcrypt.compare(req.body.password, result[0].password, (err, authenticated) => {
+    const { username, password } = req.body;
+    User.findOne({
+        where: {
+            username: username
+        }
+    })
+    .then((data) => {
+        if (data instanceof User) {
+            bcrypt.compare(password, data.password, (err, authenticated) => {
                 if (err) {
                     return res.status(401).send({ message: 'Unauthorized' });
                 }
                 if (authenticated) {
                     let token = jwt.sign({
-                        id: result[0].id,
-                        username: result[0].username
+                        id: data.id,
+                        username: data.username
                     }, 
                     process.env.JWT_KEY,
                     {
@@ -32,6 +31,9 @@ exports.postAuthentication = (req, res, next) => {
                 }
                 return res.status(401).send({ message: 'Unauthorized' });
             });
-        });
-    });
+        } else {
+            return res.status(401).send({ message: 'Unauthorized' });
+        }
+    })
+    .catch((data) => res.status(500).json({ error: err }));
 }
