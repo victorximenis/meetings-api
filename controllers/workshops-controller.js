@@ -1,172 +1,79 @@
-const mysql = require('../mysql').pool;
+const Workshop = require('../models/Workshop');
 
 exports.getWorkshops = (req, res, next) => {
-    mysql.getConnection((error, conn) => {
-        if (error) { return res.status(500).send({ error: error }) }
-        conn.query(
-            'SELECT * FROM workshops;',
-            (error, result, fields) => {
-                if (error) { return res.status(500).send({ error: error }) }
-                conn.release();
-                const response = {
-                    size: result.length,
-                    data: result.map(w => {
-                        return {
-                            id: w.id,
-                            title: w.title,
-                            places: w.places,
-                            date: w.date,
-                            request: {
-                                type: 'GET',
-                                description: 'Retorna os detalhes de um workshop',
-                                url: ((process.env.API_HOST) || 'http://localhost:' + (process.env.API_PORT || '80') + '/') + 'workshops/' + w.id
-                            }
-                        }
-                    })
-                };
-                return res.status(200).send(response);
-            }
-        );
+    Workshop.findAll()
+    .then((data) => {
+        return res.json(data);
+    })
+    .catch((err) => {
+        return res.status(500).json({ error: err });
     });
 }
 
 exports.getWorkshopById = (req, res, next) => {
-    mysql.getConnection((error, conn) => {
-        if (error) { return res.status(500).send({ error: error }) }
-        conn.query(
-            'SELECT * FROM workshops WHERE id = ?;',
-            [req.params.id],
-            (error, result, fields) => {
-                if (error) { return res.status(500).send({ error: error }) }
-                conn.release();
-                if (result.length == 0) {
-                    return res.status(404).send({
-                        mensagem: 'Não foi encontrado nenhum Workshop para o ID informado'
-                    });
-                }
-
-                const response = {
-                    message: 'Workshop localizado com sucesso',
-                    data: {
-                        id: result[0].id,
-                        title: result[0].title,
-                        places: result[0].places,
-                        date: result[0].places,
-                        request: {
-                            type: 'GET',
-                            description: 'Retorna todos os workshops',
-                            url: ((process.env.API_HOST) || 'http://localhost:' + (process.env.API_PORT || '80') + '/') + 'workshops'
-                        }
-                    }
-                };
-                return res.status(200).send(response);
-            }
-        );
+    Workshop.findByPk(req.params.id)
+    .then((data) => {
+        if (data instanceof Workshop) {
+            return res.json(data);
+        } else {
+            return res.status(404).send({mensagem: 'Workshop não encontrado'});
+        }
+    })
+    .catch((err) => {
+        return res.status(500).json({ error: err });
     });
 }
 
 exports.postWorkshop = (req, res, next) => {
-    mysql.getConnection((error, conn) => {
-        if (error) { return res.status(500).send({ error: error }) }
-        conn.query(
-            'INSERT INTO workshops (`title`,`places`,`date`)VALUES(?,?,?);',
-            [req.body.title, req.body.places, req.body.date],
-            (error, result, fields) => {
-                conn.release();
-                if (error) { return res.status(500).send({ error: error }) }
-
-                const response = {
-                    message: 'Workshop criado com sucesso',
-                    data: {
-                        title: req.body.title,
-                        places: req.body.places,
-                        date: req.body.places,
-                        request: {
-                            type: 'GET',
-                            description: 'Retorna todos os workshops',
-                            url: ((process.env.API_HOST) || 'http://localhost:' + (process.env.API_PORT || '80') + '/') + 'workshops'
-                        }
-                    }
-                };
-                res.status(201).send(response);
-            }
-        );
-    });
+    const { title, places, date } = req.body;
+    Workshop.create(
+        {
+            title: title,
+            places: places,
+            date: date
+        }
+    )
+    .then((data) => res.status(201).json({message: 'Workshop criado com sucesso'}) )
+    .catch((err) => { res.status(500).send({ error: error }) });
 }
 
 exports.putWorkshop = (req, res, next) => {
-    mysql.getConnection((error, conn) => {
-        if (error) { return res.status(500).send({ error: error }) }
-        conn.query(
-            `
-            UPDATE workshops 
-            SET title = ?, 
-            places = ?, 
-            date = ? 
-            WHERE id = ?;
-            `,
-            [req.body.title, req.body.places, req.body.date, req.params.id],
-            (error, result, fields) => {
-                conn.release();
-                if (error) { return res.status(500).send({ error: error }) }
-
-                const response = {
-                    message: 'Workshop atualizado com sucesso',
-                    data: {
-                        id: req.params.id,
-                        title: req.body.title,
-                        places: req.body.places,
-                        date: req.body.places,
-                        request: {
-                            type: 'GET',
-                            description: 'Retorna os detalhes de um workshop',
-                            url: ((process.env.API_HOST) || 'http://localhost:' + (process.env.API_PORT || '80') + '/') + 'workshops/' + req.params.id
-                        }
-                    }
-                };
-                res.status(202).send(response);
-            }
-        );
-    });
+    const { title, places, date } = req.body;
+    Workshop.findByPk(req.params.id)
+    .then((workShopFound) => {
+        if (workShopFound instanceof Workshop) {
+            Workshop.update({
+                title: title,
+                places: places,
+                date: date
+            }, {
+                where: {
+                    id: workShopFound.id
+                }
+            })
+            .then((data) => { res.status(202).json({ message: 'Workshop atualizado com sucesso' }) })
+            .catch((err) => { res.status(500).json({ error: error }) });
+        } else {
+            return res.status(404).send({mensagem: 'Workshop não encontrado'});
+        }
+    })
+    .catch((err) => { res.status(500).json({ error: error }) });
 }
 
 exports.deleteWorkshop = (req, res, next) => {
-    mysql.getConnection((error, conn) => {
-        if (error) { return res.status(500).send({ error: error }) }
-        conn.query(
-            'SELECT * FROM workshops WHERE id = ?;',
-            [req.params.id],
-            (error, result, fields) => {
-                if (result.length == 0) {
-                    return res.status(404).send({
-                        mensagem: 'Não foi encontrado nenhum Workshop para o ID informado'
-                    });
+    Workshop.findByPk(req.params.id)
+    .then((data) => {
+        if (data instanceof Workshop) {
+            Workshop.destroy({
+                where: {
+                    id: req.params.id
                 }
-
-                conn.query(
-                    'DELETE FROM workshops WHERE id = ?;',
-                    [req.params.id],
-                    (error, result, fields) => {
-                        if (error) { return res.status(500).send({ error: error }) }
-                        conn.release();
-                        const response = {
-                            message: 'Workshop deletado com sucesso',
-                            data: {
-                                id: req.params.id,
-                                title: req.body.title,
-                                places: req.body.places,
-                                date: req.body.places,
-                                request: {
-                                    type: 'GET',
-                                    description: 'Retorna todos os workshops',
-                                    url: ((process.env.API_HOST) || 'http://localhost:' + (process.env.API_PORT || '80') + '/') + 'workshops'
-                                }
-                            }
-                        };
-                        return res.status(202).send(response);
-                    }
-                );
-            }
-        );
-    });
+            })
+            .then((data) => { res.status(202).json({ message: 'Workshop deletado com sucesso' }) })
+            .catch((err) => { res.status(500).send({ error: err }) });
+        } else {
+            return res.status(404).json({mensagem: 'Não foi encontrado nenhum Workshop para o ID informado'});
+        }
+    })
+    .catch((err) => { res.status(500).json({ error: err }) });
 }
